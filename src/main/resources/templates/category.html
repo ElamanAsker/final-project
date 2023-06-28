@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="main_layout.html">
+<div layout:fragment="content">
+    <div class="row">
+        <div class="col-6 mx-auto">
+            <h1>ADD CATEGORY PAGE</h1>
+        </div>
+    </div>
+    <div class="container mt-3">
+        <div class="col-6 mx-auto">
+            <div class="row">
+                <div class="col-12">
+                    <label>CATEGORY NAME : </label>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <input type="text" class="form-control" id="categoryName" placeholder="Category : ">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label>DESCRIPTION : </label>
+                </div>
+            </div>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <textarea class="form-control" id="categoryDesc" placeholder="Description : " rows="5"></textarea>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button class="btn btn-success" onclick="addCategory()">CREATE CATEGORY</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <script>
+            function addCategory(){
+                const request = new XMLHttpRequest();
+                request.onreadystatechange = function () {
+                    if(this.readyState === request.DONE && this.status === 200) {
+                        window.location.href = "/category"
+                    }
+                };
+                let requestBody = {"name": categoryName.value, "description" : categoryDesc.value};
+                request.open("POST", "/api/category");
+                request.setRequestHeader("Content-Type","application/json;charset=UTF-8");
+                request.send(JSON.stringify(requestBody));
+            }
+        </script>
+    </div>
+    <div class="container-fluid mt-5">
+            <div class="row row-cols-1 row-cols-md-4 g-4" id="cardContainer">
+
+            </div>
+        <div>
+            <script type="text/javascript">
+                loadContent();
+                function loadContent() {
+                    const request = new XMLHttpRequest();
+                    request.onreadystatechange = function () {
+                        if (this.readyState === request.DONE && this.status == 200) {
+                            let categories = JSON.parse(request.responseText);
+                            let htmlCode = "";
+                            for (let i = 0; i < categories.length; i++) {
+                                htmlCode = htmlCode + "<div class='col mt-3'>";
+                                htmlCode = htmlCode + "<div class='card h-100'>";
+                                htmlCode = htmlCode + `<img src='/category/photo${categories[i].id}.jpg' height='150' width='40' class='card-img-top' alt='...'>`;
+                                htmlCode = htmlCode + "<div class='card-body'>";
+                                htmlCode = htmlCode + "<h5 class='card-title'>" + categories[i].name + "</h5>";
+                                htmlCode = htmlCode + "<p class='card-text'>" + categories[i].description + "</p>";
+                                htmlCode = htmlCode + "</div>";
+                                htmlCode = htmlCode + "<div class='card-footer'>";
+                                htmlCode = htmlCode + `<a class='btn btn-primary btn-sm btn-block' href='/details-category/${categories[i].id}'>DETAILS</a>`
+                                htmlCode = htmlCode + "</div>";
+                                htmlCode = htmlCode + "</div>";
+                                htmlCode = htmlCode + "</div>";
+                            }
+                            document.getElementById("cardContainer").innerHTML = htmlCode;
+                        }
+                    };
+                    request.open("GET", "/api/category");
+                    request.send();
+                }
+            </script>
+        </div>
+    </div>
+
+
+
+    <!-- Footer-->
+    <footer class="py-5 bg-dark mt-3">
+        <div class="container"><p class="m-0 text-center text-white">&copy; 2023 Incas e &copy; All Rights Reserved.</p></div>
+    </footer>
+</div>
+</html>

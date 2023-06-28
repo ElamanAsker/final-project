@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="main_layout.html">
+  <div layout:fragment="content">
+    <div class="container-fluid mt-5">
+      <div class="row" id="cardContainer">
+        <input type="hidden" th:value="${productId}" id="inpId">
+      </div>
+      <div>
+        <script type="text/javascript">
+          loadContent();
+          function loadContent() {
+            const request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+              if (this.readyState === request.DONE && this.status === 200) {
+                let product = JSON.parse(request.responseText);
+                let htmlCode = "";
+                htmlCode = htmlCode + "<div class='col-6'>";
+                htmlCode = htmlCode + "<div id='carouselExample' class='carousel slide'>";
+                htmlCode = htmlCode + "<div class='carousel-inner'>";
+                product.pictures.forEach(function(picture) {
+                  htmlCode = htmlCode + "<div class='carousel-item active'>";
+                  htmlCode = htmlCode + ` <img src="/product/${picture.image}.jpg"  height="550" class="d-block w-100" alt="...">`;
+                  htmlCode = htmlCode + "</div>"
+                });
+                htmlCode = htmlCode + "</div>"
+                htmlCode = htmlCode + "<button class='carousel-control-prev' type='button' data-bs-target='#carouselExample' data-bs-slide='prev'>"
+                htmlCode = htmlCode + "<span class='carousel-control-prev-icon' aria-hidden='true'></span>"
+                htmlCode = htmlCode + "<span class='visually-hidden'>Previous</span>"
+                htmlCode = htmlCode + "</button>"
+                htmlCode = htmlCode + "<button class='carousel-control-next' type='button' data-bs-target='#carouselExample' data-bs-slide='next'>"
+                htmlCode = htmlCode + "<span class='carousel-control-next-icon' aria-hidden='true'></span>"
+                htmlCode = htmlCode + "<span class='visually-hidden'>Next</span>"
+                htmlCode = htmlCode + "</button>"
+                htmlCode = htmlCode + "</div>"
+                htmlCode = htmlCode + "</div>"
+                htmlCode = htmlCode + "<div class='col-6'>";
+                htmlCode = htmlCode + "<h2 class='text-center' style=\"margin-top: 150px;\">" + product.name + "</h2>";
+                htmlCode = htmlCode + "<h6 class='text-center' >" + '$' + product.price + '.00' + "</h6>";
+                htmlCode = htmlCode + "<p class='text-center'>" + product.description + "</p>";
+                htmlCode = htmlCode + "<button class='btn btn-primary' style='margin-left: 260px;' type='button'>"
+                htmlCode = htmlCode + 'Amount  ' + "<span class='badge text-bg-danger'>" + product.amount + "</span>"
+                htmlCode = htmlCode + "</button>"
+                htmlCode = htmlCode + "</div>"
+                document.getElementById("cardContainer").innerHTML = htmlCode;
+              }
+            };
+            request.open("GET", "/api/product/" + inpId.value);
+            request.send();
+          }
+        </script>
+      </div>
+    </div>
+
+    <!-- Footer-->
+    <footer class="py-5 bg-dark" style="margin-top: 50px;">
+      <div class="container"><p class="m-0 text-center text-white">&copy; 2023 Incas e &copy; All Rights Reserved.</p></div>
+    </footer>
+  </div>
+</html>

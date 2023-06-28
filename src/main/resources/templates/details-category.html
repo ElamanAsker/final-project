@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="main_layout.html">
+  <div layout:fragment="content">
+    <div class="container">
+      <div class="row target">
+        <input type="hidden" th:value="${categoryId}" id="inpId">
+      </div>
+      <script>
+        loadContent();
+        function loadContent(){
+          const request = new XMLHttpRequest();
+          request.onreadystatechange = function (){
+            if (this.readyState === request.DONE && this.status === 200) {
+              let category = JSON.parse(request.responseText);
+              let htmlCode = "";
+              const target = document.querySelector('.target');
+              htmlCode = htmlCode + "<div class='col-6 mx-auto'>";
+              htmlCode = htmlCode + "<div class='row'>"
+              htmlCode = htmlCode + "<div class='col-12'>"
+              htmlCode = htmlCode + `<input type="hidden" value='${category.id}' id="categoryId">`;
+              htmlCode = htmlCode + `<input class="form-control" value="${category.name}" id="categoryName">`
+              htmlCode = htmlCode + "</div>"
+              htmlCode = htmlCode + "</div>"
+              htmlCode = htmlCode + "<div class='row mt-3'>"
+              htmlCode = htmlCode + "<div class='col-12'>"
+              htmlCode = htmlCode + `<input class="form-control" value="${category.description}" id="categoryDesc">`
+              htmlCode = htmlCode + "</div>"
+              htmlCode = htmlCode + "</div>"
+              htmlCode = htmlCode + "<div class='row mt-3'>"
+              htmlCode = htmlCode + "<div class='col-2'>"
+              htmlCode = htmlCode + `<button class='btn btn-primary' onclick="updateCategory()">UPDATE</button>`
+              htmlCode = htmlCode + "</div>"
+              htmlCode = htmlCode + "<div class='col-2'>"
+              htmlCode = htmlCode + `<button class='btn btn-danger' onclick="deleteCategory()">DELETE</button>`
+              htmlCode = htmlCode + "</div>"
+              htmlCode = htmlCode + "</div>"
+              htmlCode = htmlCode + "</div>"
+              let newDiv = document.createElement('div')
+              newDiv.innerHTML = htmlCode;
+              target.append(newDiv);
+            }
+          };
+          request.open("GET", "/api/category/" + inpId.value);
+          request.send();
+        }
+
+        function updateCategory(){
+          const request = new XMLHttpRequest();
+          request.onreadystatechange = function() {
+            if (this.readyState === request.DONE && this.status === 200) {
+              window.location.href = "/category"
+            }
+          };
+          let requestBody = {"id" : categoryId.value,"name": categoryName.value,"description": categoryDesc.value};
+          request.open("PUT", "/api/category");
+          request.setRequestHeader("Content-Type","application/json;charset=UTF-8")
+          request.send(JSON.stringify(requestBody));
+        }
+
+        function deleteCategory(){
+          let conf = confirm("ARE YOU SURE?");
+          if(conf) {
+            const request = new XMLHttpRequest();
+            request.onreadystatechange = function () {
+              if (this.readyState === request.DONE && this.status === 200) {
+                window.location.href = "/category"
+              }
+            };
+            request.open("DELETE", "/api/category/" + inpId.value);
+            request.send();
+          }
+        }
+      </script>
+    </div>
+    <div class="row mt-5">
+      <div class="col-6 mx-auto">
+        <div class="card">
+          <img th:src="@{'/category/' + 'photo' + ${categoryId + '.jpg'}}" class="card-img-top w-100">
+          <div class="card-body">
+            <form th:action="@{'/category-pic'}" method="post" enctype="multipart/form-data">
+              <input type="hidden" th:value="${categoryId}" name="categoryId">
+              <div class="row">
+                <div class="col-12">
+                  <label class="form-label">Choose Category Picture</label>
+                  <input class="form-control" type="file" name="category_picture">
+                </div>
+              </div>
+              <div class="row mt-3">
+                <div class="col-12">
+                  <button class="btn btn-success">UPLOAD CATEGORY PICTURE</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>
